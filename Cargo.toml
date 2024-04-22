@@ -1,0 +1,11 @@
+workspace = { members = ["tiny_bit_derive"] }
+[package]
+name = "packrat"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+proc-macro2 = "1.0.81"
+tiny_bit_derive = { path = "./tiny_bit_derive" }
