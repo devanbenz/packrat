@@ -1,17 +1,14 @@
 use std::fmt::Debug;
 use tiny_bit_derive::{TinyBitDeserializer, TinyBitSerializer};
 
-#[derive(TinyBitSerializer, Debug, TinyBitDeserializer)]
-pub struct KeyValue<T> {
+#[derive(TinyBitSerializer, TinyBitDeserializer, PartialEq, Debug)]
+pub struct KeyValue {
     pub key: String,
-    pub value: T,
+    pub value: String,
 }
 
-impl<T> KeyValue<T>
-where
-    T: Debug,
-{
-    pub fn new((key, value): (String, T)) -> Self {
+impl KeyValue {
+    pub fn new((key, value): (String, String)) -> Self {
         Self { key, value }
     }
 
@@ -19,8 +16,15 @@ where
         KeyValue::serialize(self)
     }
 
-    pub fn read_from_bytes(&self, bytes: Vec<u8>) -> () {
-        KeyValue::deserialize(bytes);
+    pub fn read_from_bytes(bytes: Vec<u8>) -> Vec<Self> {
+        let mut kv_vec = Vec::new();
+        let kvs = KeyValue::deserialize(bytes).expect("error deserializing");
+
+        for kv in kvs {
+            kv_vec.push(Self::new(kv));
+        }
+
+        kv_vec
     }
 }
 
@@ -35,16 +39,25 @@ mod tests {
 
     #[test]
     fn test_byte_serialization() {
-        let kv = KeyValue::new(("foo".to_string(), 100));
-        assert_eq!(
-            kv.write_to_bytes(),
-            vec![
-                75, 101, 121, 86, 97, 108, 117, 101, 32, 123, 32, 107, 101, 121, 58, 32, 34, 102,
-                111, 111, 34, 44, 32, 118, 97, 108, 117, 101, 58, 32, 49, 48, 48, 32, 125
-            ]
-        )
+        let kv = KeyValue::new(("foo".to_string(), "bar".to_string()));
+        let bytes = kv.write_to_bytes();
+
+        assert_eq!(bytes, vec![3, 102, 111, 111, 3, 98, 97, 114])
     }
 
     #[test]
-    fn test_byte_deserialization() {}
+    fn test_byte_deserialization() {
+        let a = KeyValue::read_from_bytes(vec![
+            3, 102, 111, 111, 3, 98, 97, 114, 3, 102, 111, 111, 3, 98, 97, 114, 3, 102, 111, 111,
+            3, 98, 97, 114,
+        ]);
+        assert_eq!(a.len(), 3);
+        assert_eq!(
+            *a.first().unwrap(),
+            KeyValue {
+                key: "foo".to_string(),
+                value: "bar".to_string(),
+            }
+        );
+    }
 }
