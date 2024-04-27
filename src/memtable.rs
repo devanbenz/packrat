@@ -13,7 +13,7 @@ pub struct MemTable {
 }
 
 #[derive(Debug)]
-enum MemTableError {
+pub enum MemTableError {
     GetError,
     SetError,
 }
@@ -60,6 +60,7 @@ impl MemTable {
     }
 
     pub fn flush_to_sstable(&mut self) {
+        println!("flushing to sstable");
         let mut sstable_vec = Vec::new();
         let time_stamp = SystemTime::now()
             .duration_since(UNIX_EPOCH)

@@ -9,6 +9,6 @@ mod server;
 mod wal;
 
 fn main() {
-    let state = init_state();
-    start_server(state);
+    let mut state = init_state();
+    start_server(&mut state);
 }

@@ -12,3 +12,4 @@ tiny_bit_derive = { path = "./tiny_bit_derive" }
 tempdir = "0.3.7"
 bincode = "2.0.0-rc.3"
 clap = { version = "4.5.4", features = ["derive"] }
+resp = "1.0.3"

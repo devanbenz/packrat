@@ -140,6 +140,7 @@ dependencies = [
  "bincode",
  "clap",
  "proc-macro2",
+ "resp",
  "tempdir",
  "tiny_bit_derive",
 ]
@@ -207,6 +208,12 @@ checksum = "3acd125665422973a33ac9d3dd2df85edad0f4ae9b00dafb1a05e43a9f5ef8e7"
 dependencies = [
  "winapi",
 ]
+
+[[package]]
+name = "resp"
+version = "1.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3d276d153c2c18b622527a9118d8055e4e26530f15d616d6290b00acc7e2f6aa"
 
 [[package]]
 name = "serde"

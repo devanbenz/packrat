@@ -1,18 +1,19 @@
 use crate::memtable::MemTable;
 use crate::wal::Wal;
 use clap::Parser;
+use resp::Decoder;
 use std::path::PathBuf;
 
 #[derive(Parser)]
 pub struct CliArgs {
     pub wal_dir: String,
     pub sstable_dir: String,
-    pub sstable_threshold: u8,
+    pub sstable_threshold: usize,
 }
 
 pub struct GlobalState {
     pub memtable: MemTable,
-    pub sstable_threshold: u8,
+    pub sstable_threshold: usize,
 }
 pub fn init_state() -> GlobalState {
     let cli = CliArgs::parse();
