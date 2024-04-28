@@ -33,6 +33,10 @@ impl Wal {
         let kvs = KeyValue::read_from_bytes(buf);
         kvs
     }
+
+    pub fn clear_wal(&mut self) {
+        self.0.set_len(0).expect("could not clear WAL");
+    }
 }
 
 mod tests {

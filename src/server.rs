@@ -6,7 +6,7 @@ use std::net::{TcpListener, TcpStream};
 
 fn process_cmd<'a>(state: &mut GlobalState, cmd: &[u8]) -> Result<Vec<u8>, MemTableError> {
     let mut memtable = &mut state.memtable;
-    let sstable_threshold = &state.sstable_threshold;
+    let indexes = &mut state.indexes;
 
     let mut resp_parser = Decoder::new(BufReader::new(cmd));
     let val = resp_parser.decode().expect("cannot decode value");
@@ -19,7 +19,7 @@ fn process_cmd<'a>(state: &mut GlobalState, cmd: &[u8]) -> Result<Vec<u8>, MemTa
                     Value::Bulk(v) => match v.as_str() {
                         "get" => {
                             if let Some(key) = val_iter.next() {
-                                let value = memtable.get(key.to_string_pretty())?;
+                                let value = memtable.get(key.to_string_pretty(), indexes)?;
                                 return Ok(format!("+{}\r\n", value.as_str()).into_bytes());
                             } else {
                                 return Err(MemTableError::GetError);
@@ -30,7 +30,7 @@ fn process_cmd<'a>(state: &mut GlobalState, cmd: &[u8]) -> Result<Vec<u8>, MemTa
                             let value = val_iter.next().expect("could not get value");
                             memtable.set(key.to_string_pretty(), value.to_string_pretty())?;
                             if memtable.tree.len() > state.sstable_threshold {
-                                memtable.flush_to_sstable();
+                                memtable.flush_to_sstable(&mut state.indexes);
                             }
 
                             return Ok(Vec::from("+OK\r\n".as_bytes()));
@@ -60,7 +60,11 @@ fn handle_client(mut stream: TcpStream, state: &mut GlobalState) {
             Ok(ret) => {
                 stream.write(&*ret).expect("could not write to stream");
             }
-            Err(_) => {}
+            Err(_) => {
+                stream
+                    .write(b"-There was an error\r\n")
+                    .expect("could not write to stream");
+            }
         }
     }
 }

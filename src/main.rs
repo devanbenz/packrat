@@ -3,6 +3,7 @@ use crate::server::start_server;
 
 mod cli;
 mod compaction;
+mod index;
 mod keyvalue;
 mod memtable;
 mod server;

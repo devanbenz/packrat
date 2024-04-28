@@ -2,3 +2,4 @@
 .idea/
 */**/*.dat
 *.dat
+db
